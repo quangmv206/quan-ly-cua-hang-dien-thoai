@@ -167,7 +167,7 @@ export default function OrderSuccessPage() {
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
               gap: "16px",
               textAlign: "left",
-              marginBottom: "32px",
+              marginBottom: "24px",
             }}
           >
             <div style={{ padding: "16px", borderRadius: "14px", border: "1px solid var(--color-hairline-silver)", backgroundColor: "#fff" }}>
@@ -193,6 +193,65 @@ export default function OrderSuccessPage() {
                 Bạn được bóc seal, kiểm tra máy và kích hoạt bảo hành chính hãng.
               </span>
             </div>
+          </div>
+
+          {/* Thông tin Bảo hành điện tử tự động kích hoạt */}
+          <div
+            style={{
+              backgroundColor: "rgba(22, 163, 74, 0.06)",
+              border: "1.5px solid #86efac",
+              borderRadius: "18px",
+              padding: "20px 24px",
+              textAlign: "left",
+              marginBottom: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "16px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", maxWidth: "480px" }}>
+              <div
+                style={{
+                  padding: "10px",
+                  borderRadius: "12px",
+                  backgroundColor: "#dcfce7",
+                  color: "#16a34a",
+                  flexShrink: 0,
+                }}
+              >
+                <ShieldCheck size={26} />
+              </div>
+              <div>
+                <strong style={{ fontSize: "15px", color: "#166534", display: "block", marginBottom: "4px" }}>
+                  Bảo hành điện tử chính hãng 12 tháng đã được kích hoạt
+                </strong>
+                <p style={{ margin: 0, fontSize: "13px", color: "#374151", lineHeight: 1.5 }}>
+                  Thiết bị của bạn được bảo vệ bởi chính sách 1 đổi 1 trong 30 ngày và bảo hành tại các TTBH ủy quyền.
+                  Bạn có thể tra cứu hạn bảo hành bất kỳ lúc nào bằng <strong>Số điện thoại ({order?.customer?.phone || "người mua"})</strong> hoặc mã đơn <strong>#{orderId}</strong>.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to={`/tra-cuu-bao-hanh?orderCode=${orderId}&phone=${order?.customer?.phone || ""}`}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                backgroundColor: "#16a34a",
+                color: "#ffffff",
+                padding: "10px 20px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: 700,
+                textDecoration: "none",
+                boxShadow: "0 4px 12px rgba(22, 163, 74, 0.25)",
+              }}
+            >
+              <ShieldCheck size={16} /> Xem thẻ bảo hành điện tử
+            </Link>
           </div>
 
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>

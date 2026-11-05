@@ -49,6 +49,8 @@ export default function App() {
       {/* =========================================================================
           2. CÁC TRANG CHÍNH SÁCH & THÔNG TIN DOANH NGHIỆP (Theo Bảng 2)
           ========================================================================= */}
+      <Route path="/tra-cuu-bao-hanh" element={<PolicyPages type="warranty" />} />
+      <Route path="/bao-hanh" element={<PolicyPages type="warranty" />} />
       <Route path="/chinh-sach-bao-hanh" element={<PolicyPages type="warranty" />} />
       <Route path="/chinh-sach-doi-tra" element={<PolicyPages type="return" />} />
       <Route path="/chinh-sach-giao-hang" element={<PolicyPages type="shipping" />} />

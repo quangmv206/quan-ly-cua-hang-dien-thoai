@@ -26,6 +26,7 @@ import AnnouncementBar from "./components/AnnouncementBar";
 import FloatingSupportWidget from "./components/FloatingSupportWidget";
 import Toast from "./components/Toast";
 import LoginModal from "../components/LoginModal";
+import WarrantyLookupSection from "./components/WarrantyLookupSection";
 
 import { authApi } from "../services/authApi";
 import { userApi } from "../services/userApi";
@@ -270,6 +271,16 @@ export default function AccountPage() {
             <Search size={15} />
             <span>Tra cứu đơn hàng không cần đăng nhập</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("warranty")}
+            className={activeTab === "warranty" ? "btn-pricing-blue" : "btn-explore-pill"}
+            style={{ height: "38px", fontSize: "13px", padding: "0 18px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <ShieldCheck size={15} />
+            <span>Tra cứu bảo hành điện tử (IMEI / SĐT)</span>
+          </button>
         </div>
 
         {/* TAB 1: ĐƠN HÀNG CỦA TÔI */}
@@ -380,17 +391,37 @@ export default function AccountPage() {
                       </div>
                     </div>
 
-                    <div style={{ borderTop: "1px solid var(--color-hairline-silver)", paddingTop: "14px", marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ borderTop: "1px solid var(--color-hairline-silver)", paddingTop: "14px", marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                       <span style={{ fontSize: "12px", color: "#16a34a", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                         <ShieldCheck size={14} />
                         Bảo hành chính hãng 12 tháng tại các TTBH ủy quyền
                       </span>
-                      <Link
-                        to={`/order-success?orderId=${ord.orderCode}`}
-                        style={{ fontSize: "13px", color: "var(--color-pricing-blue)", fontWeight: 600, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                      >
-                        Xem hóa đơn chi tiết <ChevronRight size={14} />
-                      </Link>
+                      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                        <Link
+                          to={`/tra-cuu-bao-hanh?orderCode=${ord.orderCode}&phone=${ord.recipientPhone}`}
+                          style={{
+                            fontSize: "12px",
+                            color: "#16a34a",
+                            fontWeight: 600,
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "5px",
+                            backgroundColor: "rgba(22, 163, 74, 0.08)",
+                            padding: "6px 12px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(22, 163, 74, 0.2)",
+                          }}
+                        >
+                          <ShieldCheck size={14} /> Tra cứu bảo hành máy này
+                        </Link>
+                        <Link
+                          to={`/order-success?orderId=${ord.orderCode}`}
+                          style={{ fontSize: "13px", color: "var(--color-pricing-blue)", fontWeight: 600, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                        >
+                          Xem hóa đơn chi tiết <ChevronRight size={14} />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -575,13 +606,41 @@ export default function AccountPage() {
                     Tổng thanh toán: {formatPrice(lookedUpOrder.totalAmount)}
                   </div>
                 </div>
-                <div style={{ marginTop: "14px", textAlign: "right" }}>
+                <div style={{ marginTop: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                  <Link
+                    to={`/tra-cuu-bao-hanh?orderCode=${lookedUpOrder.orderCode}&phone=${lookedUpOrder.recipientPhone}`}
+                    style={{
+                      fontSize: "12px",
+                      color: "#16a34a",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      backgroundColor: "rgba(22, 163, 74, 0.08)",
+                      padding: "6px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid rgba(22, 163, 74, 0.2)",
+                    }}
+                  >
+                    <ShieldCheck size={14} /> Tra cứu bảo hành điện tử máy này
+                  </Link>
                   <Link to={`/order-success?orderId=${lookedUpOrder.orderCode}`} className="link-apple-blue" style={{ fontSize: "13px" }}>
                     Xem chi tiết xác nhận đơn hàng →
                   </Link>
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TAB 4: TRA CỨU BẢO HÀNH ĐIỆN TỬ */}
+        {activeTab === "warranty" && (
+          <div>
+            <WarrantyLookupSection
+              initialType={profile.phone ? "phone" : "imei"}
+              initialQuery={profile.phone || "358912345678901"}
+            />
           </div>
         )}
       </main>

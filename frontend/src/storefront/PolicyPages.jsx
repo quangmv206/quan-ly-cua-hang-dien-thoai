@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { ShieldCheck, RotateCcw, Truck, CreditCard, Lock, MapPin, Info, HelpCircle, Phone, Search, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { ShieldCheck, RotateCcw, Truck, CreditCard, Lock, MapPin, Info, HelpCircle, Phone, Search, ChevronDown, ChevronUp, Sparkles, Smartphone, CheckCircle } from "lucide-react";
 import "./tokens.css";
 import "./storefront.css";
 
@@ -9,11 +9,33 @@ import Breadcrumb from "./components/Breadcrumb";
 import StorefrontFooter from "./components/StorefrontFooter";
 import AnnouncementBar from "./components/AnnouncementBar";
 import FloatingSupportWidget from "./components/FloatingSupportWidget";
+import WarrantyLookupSection from "./components/WarrantyLookupSection";
 import { siteSettingsApi } from "../services/siteSettingsApi";
 
 export default function PolicyPages({ type = "warranty" }) {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
+  // Đọc query params nếu người dùng đến từ đơn hàng hoặc link ngoài
+  const queryImei = searchParams.get("imei") || "";
+  const queryPhone = searchParams.get("phone") || "";
+  const queryOrder = searchParams.get("orderCode") || searchParams.get("orderId") || "";
+
+  let initialLookupType = "imei";
+  let initialLookupValue = "358912345678901";
+
+  if (queryImei) {
+    initialLookupType = "imei";
+    initialLookupValue = queryImei;
+  } else if (queryPhone) {
+    initialLookupType = "phone";
+    initialLookupValue = queryPhone;
+  } else if (queryOrder) {
+    initialLookupType = "order";
+    initialLookupValue = queryOrder;
+  }
+
+  const [warrantySubTab, setWarrantySubTab] = useState("lookup"); // 'lookup' | 'policy'
   const [policySettings, setPolicySettings] = useState(null);
 
   useEffect(() => {
@@ -45,7 +67,7 @@ export default function PolicyPages({ type = "warranty" }) {
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
   const policyMenu = [
-    { id: "warranty", label: "Chính sách bảo hành", link: "/chinh-sach-bao-hanh", icon: <ShieldCheck size={16} /> },
+    { id: "warranty", label: "Bảo hành & Tra cứu IMEI", link: "/chinh-sach-bao-hanh", icon: <ShieldCheck size={16} /> },
     { id: "return", label: "Đổi trả & Hoàn tiền", link: "/chinh-sach-doi-tra", icon: <RotateCcw size={16} /> },
     { id: "shipping", label: "Chính sách giao hàng", link: "/chinh-sach-giao-hang", icon: <Truck size={16} /> },
     { id: "payment", label: "Hướng dẫn thanh toán & Trả góp", link: "/huong-dan-thanh-toan", icon: <CreditCard size={16} /> },
@@ -175,37 +197,91 @@ export default function PolicyPages({ type = "warranty" }) {
               </div>
             )}
 
-            {/* 1. CHÍNH SÁCH BẢO HÀNH */}
+            {/* 1. CHÍNH SÁCH BẢO HÀNH & TRA CỨU ĐIỆN TỬ */}
             {currentType === "warranty" && (
               <div>
-                <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "16px", color: "var(--color-ink)" }}>
-                  Chính sách bảo hành chính hãng tại Phone Store
-                </h1>
-                <p style={{ color: "var(--color-slate)", fontSize: "14px" }}>
-                  Áp dụng cho toàn bộ điện thoại phân phối chính hãng bởi Phone Store trên toàn quốc.
-                </p>
-
-                <div style={{ borderTop: "1px solid var(--color-hairline-silver)", margin: "20px 0", paddingTop: "20px" }}>
-                  <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>1. Thời hạn và địa điểm bảo hành</h3>
-                  <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333" }}>
-                    <li><strong>Thời hạn:</strong> 12 đến 24 tháng theo đúng tiêu chuẩn nhà sản xuất (Apple Care, Samsung Care, Xiaomi Service).</li>
-                    <li><strong>Địa điểm:</strong> Toàn bộ các Trung tâm Bảo hành Ủy quyền (AASP, Samsung Brand Shop) hoặc gửi bảo hành trực tiếp tại các showroom của Phone Store.</li>
-                  </ul>
-
-                  <h3 style={{ fontSize: "16px", fontWeight: 600, marginTop: "20px", marginBottom: "8px" }}>2. Điều kiện bảo hành hợp lệ</h3>
-                  <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333" }}>
-                    <li>Máy còn trong thời hạn bảo hành căn cứ vào số IMEI/Serial Number điện tử.</li>
-                    <li>Tem niêm phong của nhà sản xuất hoặc Phone Store còn nguyên vẹn, không có dấu hiệu tẩy xóa, sửa chữa.</li>
-                    <li>Sản phẩm gặp lỗi phần cứng do nhà sản xuất trong điều kiện sử dụng bình thường.</li>
-                  </ul>
-
-                  <h3 style={{ fontSize: "16px", fontWeight: 600, marginTop: "20px", marginBottom: "8px" }}>3. Các trường hợp từ chối bảo hành</h3>
-                  <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333" }}>
-                    <li>Máy bị rơi vỡ, nứt kính, móp méo, biến dạng khung vỏ do tác động ngoại lực.</li>
-                    <li>Máy bị vô nước, ẩm mạch, cháy nổ, hoen rỉ do chất lỏng hoặc nguồn điện không ổn định.</li>
-                    <li>Máy đã bị can thiệp phần cứng, bẻ khóa bootloader, can thiệp hệ điều hành không chính thống bởi bên thứ ba.</li>
-                  </ul>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
+                  <div>
+                    <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--color-ink)" }}>
+                      Trung tâm Bảo hành Điện tử & Tra cứu IMEI
+                    </h1>
+                    <p style={{ color: "var(--color-slate)", fontSize: "14px", margin: 0 }}>
+                      Hệ thống bảo hành điện tử chính hãng dành cho toàn bộ điện thoại phân phối tại Phone Store
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setWarrantySubTab("lookup")}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: "10px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        border: "none",
+                        cursor: "pointer",
+                        backgroundColor: warrantySubTab === "lookup" ? "var(--color-pricing-blue)" : "#f1f5f9",
+                        color: warrantySubTab === "lookup" ? "#fff" : "var(--color-ink)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <Search size={15} /> Tra cứu trực tuyến
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWarrantySubTab("policy")}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: "10px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        border: "none",
+                        cursor: "pointer",
+                        backgroundColor: warrantySubTab === "policy" ? "var(--color-pricing-blue)" : "#f1f5f9",
+                        color: warrantySubTab === "policy" ? "#fff" : "var(--color-ink)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <ShieldCheck size={15} /> Quy định & Chính sách
+                    </button>
+                  </div>
                 </div>
+
+                {warrantySubTab === "lookup" ? (
+                  <div>
+                    <WarrantyLookupSection
+                      initialQuery={initialLookupValue}
+                      initialType={initialLookupType}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ borderTop: "1px solid var(--color-hairline-silver)", margin: "20px 0", paddingTop: "20px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>1. Thời hạn và địa điểm bảo hành</h3>
+                    <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333", lineHeight: 1.6 }}>
+                      <li><strong>Thời hạn:</strong> 12 đến 24 tháng theo đúng tiêu chuẩn nhà sản xuất (Apple Care, Samsung Care, Xiaomi Service).</li>
+                      <li><strong>Địa điểm:</strong> Toàn bộ các Trung tâm Bảo hành Ủy quyền (AASP, Samsung Brand Shop) hoặc gửi bảo hành trực tiếp tại các showroom của Phone Store.</li>
+                      <li><strong>Hotline kỹ thuật:</strong> Gọi ngay <strong>1800 6869</strong> (Miễn phí từ 8:00 - 21:00 hàng ngày).</li>
+                    </ul>
+
+                    <h3 style={{ fontSize: "16px", fontWeight: 600, marginTop: "20px", marginBottom: "8px" }}>2. Điều kiện bảo hành hợp lệ</h3>
+                    <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333", lineHeight: 1.6 }}>
+                      <li>Máy còn trong thời hạn bảo hành căn cứ vào số IMEI/Serial Number điện tử lưu trên hệ thống Phone Store.</li>
+                      <li>Tem niêm phong của nhà sản xuất hoặc Phone Store còn nguyên vẹn, không có dấu hiệu cạy mở, tẩy xóa.</li>
+                      <li>Sản phẩm gặp lỗi phần cứng do nhà sản xuất trong điều kiện sử dụng bình thường.</li>
+                    </ul>
+
+                    <h3 style={{ fontSize: "16px", fontWeight: 600, marginTop: "20px", marginBottom: "8px" }}>3. Các trường hợp từ chối bảo hành</h3>
+                    <ul style={{ paddingLeft: "20px", fontSize: "14px", color: "#333", lineHeight: 1.6 }}>
+                      <li>Máy bị rơi vỡ, nứt kính, móp méo, biến dạng khung vỏ do tác động ngoại lực.</li>
+                      <li>Máy bị vô nước, ẩm mạch, cháy nổ, hoen rỉ do chất lỏng hoặc nguồn điện không ổn định.</li>
+                      <li>Máy đã bị can thiệp phần cứng, bẻ khóa bootloader, can thiệp hệ điều hành không chính thống bởi bên thứ ba.</li>
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 

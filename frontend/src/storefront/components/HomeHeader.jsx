@@ -330,6 +330,17 @@ export default function HomeHeader({
                 </div>
               </Link>
 
+              {/* 2b. Tra Cứu Bảo Hành Điện Tử */}
+              <Link to="/tra-cuu-bao-hanh" className="action-pill warranty-pill" title="Tra cứu bảo hành điện tử và số IMEI">
+                <div className="action-icon-circle" style={{ backgroundColor: "rgba(22, 163, 74, 0.12)", color: "#16a34a" }}>
+                  <ShieldCheck size={16} />
+                </div>
+                <div className="action-text-col">
+                  <span className="action-subtext">Tra cứu</span>
+                  <span className="action-maintext">Bảo hành</span>
+                </div>
+              </Link>
+
               {/* 3. Tài Khoản Khách Hàng */}
               <div style={{ position: "relative" }} ref={accountRef}>
                 <button
@@ -614,7 +625,7 @@ export default function HomeHeader({
               <Link to="/huong-dan-thanh-toan" className="quick-link-item installment-badge">
                 <CreditCard size={14} /> Trả góp 0%
               </Link>
-              <Link to="/chinh-sach-bao-hanh" className="quick-link-item">
+              <Link to="/tra-cuu-bao-hanh" className="quick-link-item">
                 <ShieldCheck size={14} /> Bảo hành VIP
               </Link>
               <Link to="/lien-he" className="quick-link-item">
@@ -704,6 +715,22 @@ export default function HomeHeader({
             </div>
 
             <div style={{ paddingTop: "20px", borderTop: "1px solid #f1f5f9" }}>
+              <Link
+                to="/tra-cuu-bao-hanh"
+                onClick={() => setMobileDrawerOpen(false)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  color: "#16a34a",
+                  textDecoration: "none",
+                  marginBottom: "12px",
+                }}
+              >
+                <ShieldCheck size={18} /> Tra cứu bảo hành điện tử (IMEI)
+              </Link>
               <Link
                 to="/tin-tuc"
                 onClick={() => setMobileDrawerOpen(false)}

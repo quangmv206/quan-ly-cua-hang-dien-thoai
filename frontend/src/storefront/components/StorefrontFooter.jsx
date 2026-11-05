@@ -97,6 +97,7 @@ export default function StorefrontFooter() {
           <div>
             <h4 className="footer-col-title">Chính sách & Hỗ trợ</h4>
             <ul className="footer-link-list">
+              <li><Link to="/tra-cuu-bao-hanh" className="footer-link" style={{ fontWeight: 700, color: "var(--color-pricing-blue)" }}>🛡️ Tra cứu bảo hành điện tử (IMEI)</Link></li>
               <li><Link to="/chinh-sach-bao-hanh" className="footer-link">Chính sách bảo hành 1 đổi 1</Link></li>
               <li><Link to="/chinh-sach-giao-hang" className="footer-link">Chính sách giao hàng hỏa tốc</Link></li>
               <li><Link to="/huong-dan-thanh-toan" className="footer-link">Hướng dẫn thanh toán & Trả góp 0%</Link></li>

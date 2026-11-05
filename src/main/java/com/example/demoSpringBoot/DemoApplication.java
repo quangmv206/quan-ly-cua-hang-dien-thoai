@@ -130,20 +130,46 @@ public class DemoApplication {
 			}
 
 			if (warrantyRepository.count() == 0) {
-				com.example.demoSpringBoot.model.Warranty sampleWarranty = new com.example.demoSpringBoot.model.Warranty();
-				sampleWarranty.setImeiNumber("358912345678901");
-				sampleWarranty.setProductName("iPhone 15 Pro");
-				sampleWarranty.setVariantName("256GB - Titan Đen");
-				sampleWarranty.setCustomerName("Nguyễn Văn Khách");
-				sampleWarranty.setCustomerPhone("0987654321");
-				sampleWarranty.setOrderCode("DH-20261020-1001");
-				sampleWarranty.setStartDate(java.time.LocalDate.now().minusMonths(2));
-				sampleWarranty.setEndDate(java.time.LocalDate.now().plusMonths(10));
-				sampleWarranty.setStatus("ACTIVE");
-				sampleWarranty.setNote("Máy mua mới 100% chính hãng VNA");
-				warrantyRepository.save(sampleWarranty);
+				com.example.demoSpringBoot.model.Warranty sampleWarranty1 = new com.example.demoSpringBoot.model.Warranty();
+				sampleWarranty1.setImeiNumber("358912345678901");
+				sampleWarranty1.setProductName("iPhone 15 Pro");
+				sampleWarranty1.setVariantName("256GB - Titan Đen");
+				sampleWarranty1.setCustomerName("Nguyễn Văn Khách");
+				sampleWarranty1.setCustomerPhone("0987654321");
+				sampleWarranty1.setOrderCode("DH-20261020-1001");
+				sampleWarranty1.setStartDate(java.time.LocalDate.now().minusMonths(2));
+				sampleWarranty1.setEndDate(java.time.LocalDate.now().plusMonths(10));
+				sampleWarranty1.setStatus("ACTIVE");
+				sampleWarranty1.setNote("Máy mua mới 100% chính hãng VNA");
+				warrantyRepository.save(sampleWarranty1);
 
-				System.out.println("====== ĐÃ KHỞI TẠO DỮ LIỆU BẢO HÀNH MẪU (IMEI: 358912345678901) ======");
+				com.example.demoSpringBoot.model.Warranty sampleWarranty2 = new com.example.demoSpringBoot.model.Warranty();
+				sampleWarranty2.setImeiNumber("359876543210123");
+				sampleWarranty2.setProductName("Galaxy S24 Ultra");
+				sampleWarranty2.setVariantName("512GB - Xám Titan");
+				sampleWarranty2.setCustomerName("Huỳnh Tấn Tài");
+				sampleWarranty2.setCustomerPhone("0988888888");
+				sampleWarranty2.setOrderCode("DH-20261101-2002");
+				sampleWarranty2.setStartDate(java.time.LocalDate.now().minusMonths(1));
+				sampleWarranty2.setEndDate(java.time.LocalDate.now().plusMonths(11));
+				sampleWarranty2.setStatus("ACTIVE");
+				sampleWarranty2.setNote("Gói bảo hành toàn diện Samsung Care+ 12 tháng");
+				warrantyRepository.save(sampleWarranty2);
+
+				com.example.demoSpringBoot.model.Warranty sampleWarranty3 = new com.example.demoSpringBoot.model.Warranty();
+				sampleWarranty3.setImeiNumber("862345678901234");
+				sampleWarranty3.setProductName("Xiaomi 14");
+				sampleWarranty3.setVariantName("256GB - Trắng");
+				sampleWarranty3.setCustomerName("Trần Thị Mai");
+				sampleWarranty3.setCustomerPhone("0988776655");
+				sampleWarranty3.setOrderCode("DH-20261102-3003");
+				sampleWarranty3.setStartDate(java.time.LocalDate.now().minusMonths(6));
+				sampleWarranty3.setEndDate(java.time.LocalDate.now().plusMonths(6));
+				sampleWarranty3.setStatus("ACTIVE");
+				sampleWarranty3.setNote("Bảo hành chính hãng Digiworld phân phối");
+				warrantyRepository.save(sampleWarranty3);
+
+				System.out.println("====== ĐÃ KHỞI TẠO DỮ LIỆU BẢO HÀNH MẪU (358912345678901, 359876543210123, 862345678901234) ======");
 			}
 
 			if (voucherRepository.count() == 0) {

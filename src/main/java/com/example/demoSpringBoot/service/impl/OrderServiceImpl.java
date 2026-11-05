@@ -33,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final CartService cartService;
     private final EmailService emailService;
+    private final WarrantyRepository warrantyRepository;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             OrderItemRepository orderItemRepository,
@@ -43,7 +44,8 @@ public class OrderServiceImpl implements OrderService {
                             UserRepository userRepository,
                             CartRepository cartRepository,
                             CartService cartService,
-                            EmailService emailService) {
+                            EmailService emailService,
+                            WarrantyRepository warrantyRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
@@ -54,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
         this.cartRepository = cartRepository;
         this.cartService = cartService;
         this.emailService = emailService;
+        this.warrantyRepository = warrantyRepository;
     }
 
     @Override
@@ -248,6 +251,35 @@ public class OrderServiceImpl implements OrderService {
             payment.setPaidAt(LocalDateTime.now());
         }
         paymentRepository.save(payment);
+
+        // Tự động kích hoạt thông tin bảo hành điện tử chính hãng cho từng thiết bị trong đơn hàng
+        try {
+            if (savedOrder.getItems() != null) {
+                for (OrderItem item : savedOrder.getItems()) {
+                    for (int q = 0; q < item.getQuantity(); q++) {
+                        Warranty w = new Warranty();
+                        // Sinh mã IMEI 15 số chuẩn (bắt đầu bằng đầu số TAC 3589...)
+                        long random11Digits = 10000000000L + (long)(new Random().nextDouble() * 89999999999L);
+                        String imei = "3589" + String.valueOf(random11Digits).substring(0, 11);
+                        while (warrantyRepository.findByImeiNumber(imei).isPresent()) {
+                            random11Digits = 10000000000L + (long)(new Random().nextDouble() * 89999999999L);
+                            imei = "3589" + String.valueOf(random11Digits).substring(0, 11);
+                        }
+                        w.setImeiNumber(imei);
+                        w.setProductName(item.getProductName());
+                        w.setVariantName(item.getVariantName() != null ? item.getVariantName() : "Tiêu chuẩn");
+                        w.setCustomerName(savedOrder.getRecipientName());
+                        w.setCustomerPhone(savedOrder.getRecipientPhone());
+                        w.setOrderCode(savedOrder.getOrderCode());
+                        w.setStartDate(java.time.LocalDate.now());
+                        w.setEndDate(java.time.LocalDate.now().plusMonths(12));
+                        w.setStatus("ACTIVE");
+                        w.setNote("Kích hoạt bảo hành điện tử chính hãng tự động theo đơn #" + savedOrder.getOrderCode());
+                        warrantyRepository.save(w);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
 
         // Gửi email xác nhận đơn hàng tới khách hàng
         try {

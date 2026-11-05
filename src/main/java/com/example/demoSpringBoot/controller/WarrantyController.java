@@ -29,6 +29,16 @@ public class WarrantyController {
         return warrantyService.checkWarrantyByPhone(phone);
     }
 
+    @GetMapping("/order")
+    public List<WarrantyResponse> checkByOrder(@RequestParam String orderCode) {
+        return warrantyService.checkWarrantyByOrderCode(orderCode);
+    }
+
+    @GetMapping("/search")
+    public List<WarrantyResponse> searchWarranties(@RequestParam(required = false, defaultValue = "") String q) {
+        return warrantyService.searchWarranties(q);
+    }
+
     @GetMapping
     public List<WarrantyResponse> getAllWarranties() {
         return warrantyService.getAllWarranties();
