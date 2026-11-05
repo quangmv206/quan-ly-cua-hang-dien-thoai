@@ -1,0 +1,765 @@
+{
+  "info": {
+    "name": "Phone Store API - Security Lab 6",
+    "description": "Collection kiểm thử đầy đủ API dự án Phone Store phục vụ báo cáo bài thực hành Spring Security (MSSV_HovaTen_Security_Lab6.md).\nCác request trong thư mục '0. KIỂM THỬ LẤY ẢNH BÁO CÁO LAB 6' đã được đánh số và đặt tên tương ứng với từng thẻ ảnh cần dán trong file báo cáo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. KIỂM THỬ LẤY ẢNH BÁO CÁO LAB 6",
+      "description": "Thư mục chứa toàn bộ các request phục vụ lấy ảnh minh chứng cho báo cáo MSSV_HovaTen_Security_Lab6.md",
+      "item": [
+        {
+          "name": "01. Đăng ký tài khoản [Ảnh: Anh_DangKy_Postman]",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"123456\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            },
+            "description": "Gửi request đăng ký tài khoản user1. Dùng chụp ảnh cho mục 1.b: ![Anh_DangKy_Postman]()"
+          }
+        },
+        {
+          "name": "02. Đăng nhập Admin lấy Token [Ảnh: Anh_DangNhap_Postman]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"admin_token\", jsonData.token);",
+                  "    console.log(\"Đã tự động lưu admin_token:\", jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Đăng nhập tài khoản admin. Script test sẽ tự động lưu token vào biến {{admin_token}}. Dùng chụp ảnh cho mục 1.c: ![Anh_DangNhap_Postman]()"
+          }
+        },
+        {
+          "name": "03. GET Phones với Bearer Token [Ảnh: Anh_GetPhones_Bearer]",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            },
+            "description": "Gọi GET /api/phones kèm Bearer token (lấy từ biến {{admin_token}}). Dùng chụp ảnh cho mục 1.c: ![Anh_GetPhones_Bearer]()"
+          }
+        },
+        {
+          "name": "04. Test 1 - GET Phones KHÔNG có Token (200 OK) [Ảnh: Anh_Test1_GetPhones_NoToken]",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            },
+            "description": "Kiểm thử PUBLIC endpoint: không gửi token vẫn trả về 200 OK. Dùng chụp ảnh cho Test 1: ![Anh_Test1_GetPhones_NoToken]()"
+          }
+        },
+        {
+          "name": "05. Test 2 - POST Phone KHÔNG có Token (403 Forbidden) [Ảnh: Anh_Test2_PostPhone_NoToken]",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Phone\",\n  \"brandId\": 31,\n  \"categoryId\": 27,\n  \"price\": 10000000,\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            },
+            "description": "Kiểm thử bảo mật: tạo phone không token bị từ chối 403 Forbidden. Dùng chụp ảnh cho Test 2: ![Anh_Test2_PostPhone_NoToken]()"
+          }
+        },
+        {
+          "name": "06. Test 3 - Đăng nhập ADMIN lấy JWT (200 OK) [Ảnh: Anh_Test3_Login_Admin]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"admin_token\", jsonData.token);",
+                  "    console.log(\"Đã lưu admin_token thành công!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Đăng nhập admin thành công lấy JWT token (200 OK). Dùng chụp ảnh cho Test 3: ![Anh_Test3_Login_Admin]()"
+          }
+        },
+        {
+          "name": "07. Test 4 - POST Phone với token ADMIN (201 Created) [Ảnh: Anh_Test4_PostPhone_Admin]",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Samsung Galaxy Z Fold 6\",\n  \"brandId\": 31,\n  \"categoryId\": 27,\n  \"price\": 35000000,\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            },
+            "description": "Admin tạo mới điện thoại thành công trả về 201 Created. Dùng chụp ảnh cho Test 4: ![Anh_Test4_PostPhone_Admin]()"
+          }
+        },
+        {
+          "name": "08. Đăng nhập USER lấy Token (Chuẩn bị cho Test 5)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"user_token\", jsonData.token);",
+                  "    console.log(\"Đã lưu user_token:\", jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Đăng nhập user thông thường để lấy token gán vào biến {{user_token}} chuẩn bị cho Test 5."
+          }
+        },
+        {
+          "name": "09. Test 5 - POST Phone với token USER (403 Forbidden) [Ảnh: Anh_Test5_PostPhone_UserRole]",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{user_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Phone User Role\",\n  \"brandId\": 31,\n  \"categoryId\": 27,\n  \"price\": 10000000,\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            },
+            "description": "User thông thường gọi POST /api/phones bị từ chối 403 Forbidden do thiếu quyền ADMIN. Dùng chụp ảnh cho Test 5: ![Anh_Test5_PostPhone_UserRole]()"
+          }
+        },
+        {
+          "name": "10. Test 6 - Đăng ký user mới qua register (201 Created) [Ảnh: Anh_Test6_Register]",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newuser_lab6\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            },
+            "description": "Đăng ký người dùng mới thành công trả về 201 Created. Dùng chụp ảnh cho Test 6: ![Anh_Test6_Register]()"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Phones (Quản lý Điện thoại)",
+      "item": [
+        {
+          "name": "Lấy danh sách điện thoại (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            }
+          }
+        },
+        {
+          "name": "Tìm kiếm theo tên (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/phones/search?name=iPhone",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones", "search"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "iPhone"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xem chi tiết điện thoại theo ID (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/phones/86",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones", "86"]
+            }
+          }
+        },
+        {
+          "name": "Thêm điện thoại mới (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 16 Pro Max\",\n  \"brandId\": 31,\n  \"categoryId\": 27,\n  \"price\": 34990000,\n  \"quantity\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật điện thoại (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 15 Pro Max 256GB\",\n  \"brandId\": 31,\n  \"categoryId\": 27,\n  \"price\": 28500000,\n  \"quantity\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phones/86",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones", "86"]
+            }
+          }
+        },
+        {
+          "name": "Xóa điện thoại (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/phones/87",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phones", "87"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Brands (Quản lý Thương hiệu)",
+      "item": [
+        {
+          "name": "Lấy danh sách Hãng (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands"]
+            }
+          }
+        },
+        {
+          "name": "Xem chi tiết Hãng (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/brands/31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands", "31"]
+            }
+          }
+        },
+        {
+          "name": "Thêm Hãng mới (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sony\",\n  \"description\": \"Sony Corporation Japan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật Hãng (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Apple Corporation\",\n  \"description\": \"Apple Inc. California\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brands/31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands", "31"]
+            }
+          }
+        },
+        {
+          "name": "Xóa Hãng (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/brands/31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands", "31"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Categories (Quản lý Danh mục)",
+      "item": [
+        {
+          "name": "Lấy danh sách Danh mục (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Xem chi tiết Danh mục (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/27",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "27"]
+            }
+          }
+        },
+        {
+          "name": "Thêm Danh mục mới (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tablet\",\n  \"description\": \"Máy tính bảng\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật Danh mục (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Smartphone cao cấp\",\n  \"description\": \"Điện thoại thông minh\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/27",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "27"]
+            }
+          }
+        },
+        {
+          "name": "Xóa Danh mục (Yêu cầu Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/27",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "27"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Users & Auth (Xác thực & Người dùng)",
+      "item": [
+        {
+          "name": "Đăng ký User (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student01\",\n  \"password\": \"123456\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Đăng nhập Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Đăng nhập User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Lấy danh sách người dùng (Cần Token)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Đăng xuất (Logout)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "logout"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
